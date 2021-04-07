@@ -2,7 +2,7 @@ package com.company;
 
 public class Main {
 
-    public static void main(String[] args) throws DatosIncorrectosException {
+    public static void main(String[] args) {
 	/*
 	*
 	* Sistema para gestión de socios en un gimnasio
@@ -37,7 +37,7 @@ Consignas de prueba:
         Socio socio = null;
 
 
-            socio = new Socio("Francini", "9080-1090","123456789",7,1);
+            socio = new Socio("Faniel", "9080-1090","30303030303030",7,1);
             gimnasio.agregarSocio(socio);
 
 

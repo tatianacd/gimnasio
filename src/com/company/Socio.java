@@ -1,5 +1,8 @@
 package com.company;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Socio {
 
     private String nombre;
@@ -8,15 +11,30 @@ public class Socio {
     private int sede;
     private int plan;
 
-    public Socio(String nombre, String telefono, String documento, int sede, int plan) throws DatosIncorrectosException{
+    private String dbName = "gimnasio";
+    private String dbUser = "root";
+    private String dbPwd = "Ada2020+";
+
+    public Socio(String nombre, String telefono, String documento, int sede, int plan) {
         this.nombre = nombre;
         this.telefono = telefono;
         this.documento = documento;
         this.sede = sede;
-        setPlan(plan);
+
+
+        try {
+            setPlan(plan);
+        } catch (DatosIncorrectosException e) {
+            System.out.println(e.getMessage());
+            this.plan = 3;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+
     }
 
-    public Socio() throws DatosIncorrectosException{
+    public Socio() throws DatosIncorrectosException {
         this.nombre = "";
         this.telefono = "";
         this.documento = "";
@@ -60,13 +78,23 @@ public class Socio {
         return plan;
     }
 
-    public void setPlan(int plan) throws DatosIncorrectosException {
-        String nombre = this.getNombre().toUpperCase();
+    public void setPlan(int plan) throws DatosIncorrectosException, SQLException {
+        ConexionBaseDeDatos conexionBaseDeDatos = new ConexionBaseDeDatos(dbName, dbUser, dbPwd);
+        String nombre = this.getNombre().toUpperCase().substring(0, 1);
+        String consulta = "SELECT id FROM gimnasio.planes WHERE nombre LIKE '%promo%' ";
+        ResultSet resultados = conexionBaseDeDatos.consultar(consulta);
 
-        if(plan == 1 && !(nombre.startsWith("A",0) || nombre.startsWith("B",0) ||
-                nombre.startsWith("C",0) || nombre.startsWith("D",0))){
-            throw new DatosIncorrectosException("No se puede crear este socio xq su nombre no inicia con ABCD");
+        if (resultados != null) {
+            while (resultados.next()) {
+                int id =  resultados.getInt("id");
+
+                if (plan == id && !(nombre.startsWith("A") || nombre.startsWith("B") ||
+                        nombre.startsWith("C") || nombre.startsWith("D"))) {
+                    throw new DatosIncorrectosException("No se puede crear este socio xq su nombre no inicia con A,B,C o D por defecto se le agregara el plan mensual.");
+                }
+            }
         }
+
 
         this.plan = plan;
     }

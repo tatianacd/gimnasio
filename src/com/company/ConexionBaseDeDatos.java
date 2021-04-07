@@ -3,8 +3,6 @@ package com.company;
 import java.sql.*;
 
 public class ConexionBaseDeDatos {
-
-
         private Connection conexion = null;
         private Statement st = null;
         private ResultSet rs = null;
@@ -25,6 +23,7 @@ public class ConexionBaseDeDatos {
                 conexion = DriverManager.getConnection(dbURL,dbUSER,dbPWD);
                 st = conexion.createStatement();
             } catch (SQLException e) {
+                System.out.println(e.getMessage());
                 System.out.println("No se ha podido conectar con la base de datos.");
             }
         }
@@ -33,6 +32,7 @@ public class ConexionBaseDeDatos {
             try {
                 rs = st.executeQuery(sql);
             } catch (SQLException | NullPointerException e) {
+                System.out.println(e.getMessage());
                 System.out.println("No se ha podido realizar su búsqueda.");
             }
             return rs;

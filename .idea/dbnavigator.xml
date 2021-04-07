@@ -26,7 +26,7 @@
     <show-object-properties value="true" />
     <loaded-nodes>
       <connection connection-id="eadf3859-6731-49ad-8c5e-e7b991e4bdd6">
-        <schema name="gimnasio" object-types="constraint, table, column, dataset trigger, index, view" />
+        <schema name="gimnasio" object-types="table, view" />
       </connection>
     </loaded-nodes>
   </component>

@@ -10,14 +10,16 @@ public class Gimnasio {
     private String dbPwd = "Ada2020+";
 
     public void agregarSocio(Socio socio) {
+        String nombre = socio.getNombre();
+        String telefono = socio.getTelefono();
+        String documento = socio.getDocumento();
+        int sucursal = socio.getSede();
+        int plan = socio.getPlan();
 
-        try {
+        boolean isInsertado = validarDocumento(documento);
+        System.out.println(isInsertado);
+        if (!isInsertado) {
             ConexionBaseDeDatos conexionBaseDeDatos = new ConexionBaseDeDatos(dbName, dbUser, dbPwd);
-            String nombre = socio.getNombre();
-            String telefono = socio.getTelefono();
-            String documento = socio.getDocumento();
-            int sucursal = socio.getSede();
-            int plan = socio.getPlan();
             String sql = "INSERT INTO socios (nombre, telefono, documento, idSucursal, plan) VALUES ('" +
                     nombre + "','" + telefono + "','" + documento + "','" + sucursal + "','" + plan + "');";
             boolean respuesta = false;
@@ -28,10 +30,12 @@ public class Gimnasio {
             } finally {
                 conexionBaseDeDatos.cerrar();
             }
-        } catch (NumberFormatException e) {
+        } else {
+            System.out.println("No se puede agregar este socio porque ya existe uno con ese documento");
         }
     }
-    public void buscarYMostrar(String sql) {
+
+    public void buscarYMostrarSocioSede(String sql) {
         ConexionBaseDeDatos conexionBaseDeDatos = new ConexionBaseDeDatos(dbName, dbUser, dbPwd);
         ResultSet resultados = conexionBaseDeDatos.consultar(sql);
         try {
@@ -43,7 +47,7 @@ public class Gimnasio {
         }
     }
 
-    public void buscarYMostrar1(String sql) {
+    public void buscarYMostrarSocioPlan(String sql) {
         ConexionBaseDeDatos conexionBaseDeDatos = new ConexionBaseDeDatos(dbName, dbUser, dbPwd);
         ResultSet resultados = conexionBaseDeDatos.consultar(sql);
         try {
@@ -59,24 +63,39 @@ public class Gimnasio {
         if (resultados != null) {
             while (resultados.next()) {
                 System.out.println(" Nombre: " + resultados.getString("socios.nombre") + " Nombre de Sucursal: " + resultados.getString("sucursales.nombre") + " Id de sucursal: " + resultados.getString("sucursales.id"));
-
             }
         }
-    }private void mostrarResultadosSocioPlan(ResultSet resultados) throws SQLException {
+    }
+
+    private void mostrarResultadosSocioPlan(ResultSet resultados) throws SQLException {
         if (resultados != null) {
             while (resultados.next()) {
                 System.out.println(" Nombre: " + resultados.getString("socios.nombre") + " Nombre del plan: " + resultados.getString("planes.nombre") + " Id del plan: " + resultados.getString("planes.id"));
-
             }
         }
     }
 
     public void listarSociosDeSede(int sucursalId) {
-        buscarYMostrar("SELECT socios.nombre, sucursales.nombre, sucursales.id FROM socios INNER JOIN gimnasio.sucursales ON socios.idSucursal= sucursales.id WHERE sucursales.id = " + sucursalId);
+        buscarYMostrarSocioSede("SELECT socios.nombre, sucursales.nombre, sucursales.id FROM socios INNER JOIN gimnasio.sucursales ON socios.idSucursal= sucursales.id WHERE sucursales.id = " + sucursalId);
     }
 
     public void listarSociosDePlan(int idPlan) {
-        buscarYMostrar1("SELECT socios.nombre, planes.nombre, planes.id FROM socios INNER JOIN gimnasio.planes ON planes.id= socios.plan WHERE planes.id = " + idPlan);
+        buscarYMostrarSocioPlan("SELECT socios.nombre, planes.nombre, planes.id FROM socios INNER JOIN gimnasio.planes ON planes.id= socios.plan WHERE planes.id = " + idPlan);
     }
 
+    public boolean validarDocumento(String documento) {
+        ConexionBaseDeDatos conexionBaseDeDatos = new ConexionBaseDeDatos(dbName, dbUser, dbPwd);
+        String consulta = "SELECT documento FROM socios WHERE documento =" + documento;
+        ResultSet resultados = conexionBaseDeDatos.consultar(consulta);
+
+        if (resultados != null) {
+            try {
+                return resultados.next();
+            } catch (SQLException throwables) {
+                System.out.println(throwables.getMessage());
+                return false;
+            }
+        }
+        return false;
+    }
 }
